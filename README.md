@@ -1,35 +1,19 @@
-# F1
-End-to-end project serving ETL and BI for F1-centered data,  part of IAD study program at Faculty of Mathematics and Information Science, Warsaw University of Technology
+# Indoor - Outdoor classifier
 
-# Deployment
+Following repo holds code for end-to-end training of indoor-outdoor classifier.
 
-With local .env file created containing
-```bash
-PREFECT_CLOUD_API_KEY=
-PREFECT_CLOUD_WORKSPACE=
-REPO_URL=
-REPO_TOKEN=
-DB_HOST=
-DB_PORT=
-DB_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
-```
+## Dataset Preparation
 
-In poetry home run `poetry run deploy && poetry run prefect deploy --all`.
+Entire net is trained on [Wikimedia](https://huggingface.co/datasets/wikimedia/wit_base) image dataset, containing around 11 millions of unique images. They are not classified into indoor/outdoor, so labels are generated using [Indoor-Outdoor net](https://huggingface.co/prithivMLmods/IndoorOutdoorNet). MLLMs were also checked as potential models for label generation in [exploration notebook](test_models.ipynb), yet they yielded very poor performance. For maximizing dataset quality, data preparation includes following steps:
 
-# Local run for prefect
+- download data batch from source
+- extract image, embedding
+- remove images that are corrupted, ie length of unique pixel values is smaller than 10
+- get images class with indoor outdoor net
+- remove images where model confidence is low (ie in (0.1, 0.9)) - risk of mislabelling
+- perform images deduplication
+- save label, image and embedding
 
-```bash
-prefect server start
+This created initial dataset, that is created in batches. Final dataset is calculated from it using additional deduplication step and removing embedding for space optimizations.
 
-# in diferent terminal
-prefect worker start --pool 'default-work-pool'
-```
-
-# Local run of flows
-
-For example for entire elt process for Racing Circuits:
-```
-clear && poetry run python -m src.f1.flows.racing_circuits.elt
-```
+## Model training

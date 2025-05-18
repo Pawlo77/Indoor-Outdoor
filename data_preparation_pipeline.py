@@ -249,6 +249,8 @@ def prepare_initial_set(
                 with TimedLog(
                     logger, f"Performed IO operations from dataset part {i - start_id}."
                 ):
+                    df = df[["image", "is_outdoor", "embedding"]]
+
                     while True:
                         if df_to_save is None:
                             df_to_save = df.head(rows_per_file)
