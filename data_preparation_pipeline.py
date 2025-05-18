@@ -80,13 +80,10 @@ def _save_batch(
     os.makedirs(results_dir, exist_ok=True)
     file_path = os.path.join(
         results_dir,
-        f"initial_set_part_{i}.parquet",
+        f"initial_set_part_{i}.npy",
     )
+    np.save(file_path, df.values)
 
-    df.to_parquet(
-        file_path,
-        index=False,
-    )
     logger.debug("Saved batch %d to parquet file.", i)
     return file_path
 
