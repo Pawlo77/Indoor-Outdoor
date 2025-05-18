@@ -215,6 +215,10 @@ def prepare_initial_set(
                     df = cast(pd.DataFrame, df.iloc[unique_indices, :])
                     df = df.reset_index(drop=True)
 
+                logger.info(
+                    "Unique images from dataset part %d: %d", i - start_id, len(df)
+                )
+
                 # classify images in batches
                 with TimedLog(
                     logger, f"Classified images from dataset part {i - start_id}."
@@ -236,7 +240,7 @@ def prepare_initial_set(
                     logger,
                     f"Removed uncertain images from dataset part {i - start_id}.",
                 ):
-                    certain_mask = (df["outdoor_prob"] < certainty_cutoff) & (
+                    certain_mask = (df["outdoor_prob"] < certainty_cutoff) | (
                         df["outdoor_prob"] > 1 - certainty_cutoff
                     )
                     df = df[certain_mask]
@@ -244,6 +248,9 @@ def prepare_initial_set(
 
                     df["is_outdoor"] = df["outdoor_prob"] > 0.5
                     df.drop(columns=["outdoor_prob"], inplace=True)
+
+                processed_rows += len(df)
+                processed_parts += 1
 
                 # saving and removing original files
                 with TimedLog(
@@ -294,9 +301,6 @@ def prepare_initial_set(
                         if os.path.exists(file_path):
                             os.remove(file_path)
                             logger.debug("Removed original file %s", file_path)
-
-                processed_rows += len(df)
-                processed_parts += 1
 
                 # logging using lazy formatting
                 if stop_after_k_rows is not None:
