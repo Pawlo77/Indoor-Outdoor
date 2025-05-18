@@ -300,8 +300,8 @@ def prepare_initial_set(
 
                 # logging using lazy formatting
                 if stop_after_k_rows is not None:
-                    logger.debug(
-                        "Processed part %d (%d / %d rows saved). Total saved rows: %d / %d.",
+                    logger.info(
+                        "Processed part %d (%d / %d rows accepted). Total accepted rows: %d / %d.",
                         i - start_id,
                         processed_rows,
                         initial_rows,
@@ -310,7 +310,7 @@ def prepare_initial_set(
                     )
                 else:
                     logger.info(
-                        "Processed part %d of %d (%d / %d rows saved). Total saved rows: %d.",
+                        "Processed part %d of %d (%d / %d rows accepted). Total accepted rows: %d.",
                         i - start_id,
                         end_id - start_id,
                         processed_rows,
