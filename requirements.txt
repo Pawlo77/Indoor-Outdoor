@@ -1,0 +1,10 @@
+datasets
+lmstudio
+numpy
+pandas
+Pillow
+Requests
+scikit_learn
+torch
+tqdm
+transformers
