@@ -4,7 +4,7 @@ Following repo holds code for end-to-end training of indoor-outdoor classifier.
 
 ## Dataset Preparation
 
-Entire net is trained on [Wikimedia](https://huggingface.co/datasets/wikimedia/wit_base) image dataset, containing around 11 millions of unique images. They are not classified into indoor/outdoor, so labels are generated using [Indoor-Outdoor net](https://huggingface.co/prithivMLmods/IndoorOutdoorNet). MLLMs were also checked as potential models for label generation in [exploration notebook](test_models.ipynb), yet they yielded very poor performance. For maximizing dataset quality, data preparation includes following steps:
+Entire net is trained on [Wikimedia](https://huggingface.co/datasets/wikimedia/wit_base) image dataset, containing around 6.5 millions of unique images. They are not classified into indoor/outdoor, so labels are generated using [Indoor-Outdoor net](https://huggingface.co/prithivMLmods/IndoorOutdoorNet). MLLMs were also checked as potential models for label generation in [exploration notebook](test_models.ipynb), yet they yielded very poor performance. For maximizing dataset quality, data preparation includes following steps:
 
 - download data batch from source
 - extract image, embedding

@@ -3,6 +3,9 @@ data_prepared/
 data/
 experiments/
 
+# Tests
+test.ipynb
+
 # Macos
 .DS_Store
 

@@ -5,7 +5,6 @@ from typing import Any, Dict, List
 
 import pandas as pd
 import requests
-from datasets import DatasetDict, load_dataset
 
 from llm_utils import get_outdoor_model_prediction
 from utils import TimedLog, get_logger
@@ -16,18 +15,6 @@ URL_TEMPLATE: str = (
     "https://huggingface.co/datasets/wikimedia/wit_base/resolve"
     "/main/data/train-{id}-of-00330.parquet?download=true"
 )
-
-
-def get_dataset() -> DatasetDict:
-    """
-    Returns the dataset for the model.
-
-    Returns:
-        DatasetDict: The dataset containing the training and validation splits.
-    """
-
-    ds = load_dataset("wikimedia/wit_base")
-    return ds
 
 
 # pylint: disable=magic-value-comparison
@@ -81,7 +68,7 @@ def download_dataset_part(
 
 def load_dataset_part(
     dataset_id: int = 0, target: str = os.path.join(os.path.dirname(__file__), "data")
-) -> DatasetDict:
+) -> pd.DataFrame:
     """
     Loads a part of the dataset.
 
@@ -97,9 +84,8 @@ def load_dataset_part(
     file_path = get_file_path(dataset_id=dataset_id, target=target)
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File {file_path} does not exist.")
-    ds = load_dataset("parquet", data_files=file_path)
 
-    return ds
+    return pd.read_parquet(file_path)
 
 
 # pylint: disable=magic-value-comparison
@@ -122,18 +108,18 @@ def load_cleaned_dataset_part(
     """
     # Load the dataset part
     dataset_part = load_dataset_part(dataset_id=dataset_id, target=target)
-    train_dataset = dataset_part["train"]
 
     # Print the dataset part
     if show_example:
         logger.info("Sample entry from dataset part %d:", dataset_id)
-        for k, v in train_dataset[0].items():
+        example = dataset_part.head(1).to_dict()
+        for k, v in example.items():
             v = str(v)
             formatted_v = v[:100] + "..." if len(v) > 100 else v
             logger.info("\t%s: %s", k, formatted_v)
 
-        language_idx = train_dataset[0]["wit_features"]["language"].index("en")
-        for k, v in train_dataset[0]["wit_features"].items():
+        language_idx = list(example["wit_features"]["language"]).index("en")
+        for k, v in example["wit_features"].items():
             v = str(v[language_idx])
             if len(v) > 100:
                 formatted_v = v[:100] + "..."
@@ -142,9 +128,9 @@ def load_cleaned_dataset_part(
             logger.info("\t\t%s: %s", k, formatted_v)
 
     dt = []
-    for i, entry in enumerate(train_dataset):
+    for i, entry in dataset_part.iterrows():
         try:
-            language_idx = entry["wit_features"]["language"].index("en")
+            language_idx = list(entry["wit_features"]["language"]).index("en")
         except ValueError:
             logger.debug(
                 "Language 'en' not found in entry %d - %s, skipping...",
