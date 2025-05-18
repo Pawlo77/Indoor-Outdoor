@@ -2,7 +2,10 @@
 
 import logging
 import time
+import warnings
 from typing import Any
+
+warnings.simplefilter("ignore")
 
 
 def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:

@@ -130,7 +130,7 @@ def prepare_initial_set(
     end_id: int | None = None,
     stop_after_k_rows: int = 2 * 10**6,
     batch_size: int = 128,
-    rows_per_file: int = 10**5,
+    rows_per_file: int = 10**4,
     min_unique_pixels_num: int = 10,
     certainty_cutoff: float = 0.1,
     deduplication_threshold: float = 0.95,
@@ -177,16 +177,16 @@ def prepare_initial_set(
             with TimedLog(
                 logger, f"Processed dataset ({i - start_id} / {end_id - start_id})"
             ):
-                df = pd.DataFrame(
-                    load_cleaned_dataset_part(
-                        dataset_id=i, target=data_dir, show_example=False
-                    )
-                )
-                initial_rows = len(df)
-
                 with TimedLog(
                     logger, f"Loaded images from dataset part {i - start_id}."
                 ):
+                    df = pd.DataFrame(
+                        load_cleaned_dataset_part(
+                            dataset_id=i, target=data_dir, show_example=False
+                        )
+                    )
+                    initial_rows = len(df)
+
                     df["image"] = df["image"].apply(
                         lambda x: np.array(Image.open(io.BytesIO(x)).convert("RGB"))
                     )
@@ -199,6 +199,20 @@ def prepare_initial_set(
                     unique_pixels_num = df["image"].apply(lambda x: len(np.unique(x)))
                     corrupted_mask = unique_pixels_num < min_unique_pixels_num
                     df = df[~corrupted_mask]
+                    df = df.reset_index(drop=True)
+
+                # remove duplicates based on embeddings
+                with TimedLog(
+                    logger,
+                    f"Removed duplicated images from dataset part {i - start_id}.",
+                ):
+                    embeddings = np.array(df["embedding"].tolist())
+                    unique_indices = deduplicate_embeddings(
+                        embeddings,
+                        threshold=deduplication_threshold,
+                        return_pairs=False,
+                    )
+                    df = cast(pd.DataFrame, df.iloc[unique_indices, :])
                     df = df.reset_index(drop=True)
 
                 # classify images in batches
@@ -230,20 +244,6 @@ def prepare_initial_set(
 
                     df["is_outdoor"] = df["outdoor_prob"] > 0.5
                     df.drop(columns=["outdoor_prob"], inplace=True)
-
-                # remove duplicates based on embeddings
-                with TimedLog(
-                    logger,
-                    f"Removed duplicated images from dataset part {i - start_id}.",
-                ):
-                    embeddings = np.array(df["embedding"].tolist())
-                    unique_indices = deduplicate_embeddings(
-                        embeddings,
-                        threshold=deduplication_threshold,
-                        return_pairs=False,
-                    )
-                    df = cast(pd.DataFrame, df.iloc[unique_indices, :])
-                    df = df.reset_index(drop=True)
 
                 # saving and removing original files
                 with TimedLog(
@@ -309,7 +309,7 @@ def prepare_initial_set(
                         stop_after_k_rows,
                     )
                 else:
-                    logger.debug(
+                    logger.info(
                         "Processed part %d of %d (%d / %d rows saved). Total saved rows: %d.",
                         i - start_id,
                         end_id - start_id,
