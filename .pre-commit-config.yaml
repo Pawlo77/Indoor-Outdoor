@@ -74,6 +74,7 @@ repos:
           - tqdm
           - transformers
           - humanize
+          - matplotlib
 
   # python code security checks
   - repo: https://github.com/PyCQA/bandit
@@ -123,6 +124,7 @@ repos:
   #         - tqdm
   #         - transformers
   #         - humanize
+  #         - matplotlib
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

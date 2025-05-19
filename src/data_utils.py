@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import requests
 from PIL import Image
+from PIL.ImageFile import ImageFile
 
 from .llm_utils import get_outdoor_model_prediction
 from .utils import TimedLog, get_logger
@@ -21,7 +22,7 @@ URL_TEMPLATE: str = (
     "/main/data/train-{id}-of-00330.parquet?download=true"
 )
 
-DATA_DIR: str = os.path.join(os.path.dirname(__file__), "data")
+DATA_DIR: str = os.path.join(os.path.dirname(__file__), "..", "data")
 
 
 # pylint: disable=magic-value-comparison
@@ -206,7 +207,7 @@ def perform_experiment(
         return file_path
 
 
-def _process_image(img: bytes, image_shape: Tuple[int, int]) -> np.ndarray:
+def process_image(img: Any, image_shape: Tuple[int, int] = (256, 256)) -> np.ndarray:
     """
     Processes the image bytes into a numpy array.
     Args:
@@ -215,7 +216,11 @@ def _process_image(img: bytes, image_shape: Tuple[int, int]) -> np.ndarray:
     Returns:
         The processed image as a numpy array.
     """
-    return np.array(Image.open(io.BytesIO(img)).convert("RGB").resize(image_shape))
+    if isinstance(img, bytes):
+        img = io.BytesIO(img)
+    if not isinstance(img, ImageFile):
+        img = Image.open(img)
+    return np.array(img.convert("RGB").resize(image_shape))
 
 
 # pylint: disable=magic-value-comparison
@@ -251,7 +256,7 @@ def load_cleaned_dataset_part_minimal(
     df["image"] = list(
         executor.map(
             partial(
-                _process_image,
+                process_image,
                 image_shape=image_shape,
             ),
             df["image"],

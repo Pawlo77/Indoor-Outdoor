@@ -1,9 +1,14 @@
 """Utility functions for logging and timing."""
 
+import io
 import logging
 import time
 import warnings
-from typing import Any
+from typing import Any, List
+
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
 
 warnings.simplefilter("ignore")
 
@@ -69,3 +74,30 @@ class TimedLog:
         self.logger.log(
             self.level, f"{self.message}  (Elapsed time: {elapsed_time:.2f} s)"
         )
+
+
+def plot_images(images: List[Any], ncols: int = 5, labels: List[str] = None) -> None:
+    """
+    Plots a grid of images.
+
+    Args:
+        images: List of image data (e.g., bytes or PIL images).
+        ncols: Number of columns in the grid.
+        labels: Optional list of labels for each image.
+    """
+    nrows = len(images) // ncols + (len(images) % ncols > 0)
+    _, axes = plt.subplots(nrows, ncols, figsize=(15, nrows * 3))
+
+    for i, (ax, img) in enumerate(zip(axes.ravel(), images)):
+        if isinstance(img, bytes):
+            img = Image.open(io.BytesIO(img))
+        elif isinstance(img, np.ndarray):
+            img = Image.fromarray(img)
+        ax.imshow(img)
+        ax.axis("off")
+
+        if labels is not None:
+            ax.set_title(labels[i])
+
+    plt.tight_layout()
+    plt.show()

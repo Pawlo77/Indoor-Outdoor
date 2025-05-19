@@ -10,3 +10,4 @@ tqdm
 transformers
 pytables
 humanize
+matplotlib

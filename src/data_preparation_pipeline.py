@@ -24,7 +24,7 @@ from .utils import TimedLog, get_logger
 
 logger = get_logger(__name__)
 
-RESULTS_DIR: str = os.path.join(os.path.dirname(__file__), "data_prepared")
+RESULTS_DIR: str = os.path.join(os.path.dirname(__file__), "..", "data_prepared")
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 
