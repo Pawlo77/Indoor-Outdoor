@@ -14,6 +14,6 @@ Entire net is trained on [Wikimedia](https://huggingface.co/datasets/wikimedia/w
 - perform images deduplication
 - save label, image and embedding
 
-This created initial dataset, that is created in batches. Final dataset is calculated from it using additional deduplication step and removing embedding for space optimizations.
+This created initial dataset, that is created in batches. Final dataset is calculated from it using additional deduplication step and removing embedding for space optimizations. It is stratified splitted into train, valid, test of ratios 0.8, 0.1, 0.1 and saved into .npz files of 10000 entries each.
 
 ## Model training
