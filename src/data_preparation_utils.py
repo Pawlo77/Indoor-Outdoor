@@ -9,12 +9,14 @@ import numpy as np
 import pandas as pd
 from tqdm.notebook import tqdm
 
-from .data_preparation_pipeline import RESULTS_DIR as DATA_PREPARATION_RESULTS_DIR
+from .data_extraction_pipeline import RESULTS_DIR as DATA_PREPARATION_RESULTS_DIR
 from .utils import TimedLog, get_logger
 
 logger = get_logger(__name__)
 
-RESULTS_DIR: str = os.path.join(os.path.dirname(__file__), "..", "datasets")
+RESULTS_DIR: str = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "datasets")
+)
 
 
 def get_files(
@@ -157,22 +159,29 @@ def process_and_save_batches(
             "labels": None,
             "counter": 0,
             "remove_map": training_indices_to_remove_per_file,
+            "max_size": 80000,
+            "size": 0,
         },
         "val": {
             "images": None,
             "labels": None,
             "counter": 0,
             "remove_map": validation_indices_to_remove_per_file,
+            "max_size": 10000,
+            "size": 0,
         },
         "test": {
             "images": None,
             "labels": None,
             "counter": 0,
             "remove_map": test_indices_to_remove_per_file,
+            "max_size": 10000,
+            "size": 0,
         },
     }
 
     # pylint: disable=unsubscriptable-object
+    stop = False
     with TimedLog(logger, "Processing and saving batches of images and labels"):
         for i in tqdm(range(len(labels_files)), desc="Processing files", unit="file"):
             labels_file = labels_files[i]
@@ -211,14 +220,25 @@ def process_and_save_batches(
                     data["images"] = data["images"][target_file_size:]
                     data["labels"] = data["labels"][target_file_size:]
                     data["counter"] += 1
+                    data["size"] += target_file_size
+
+            if (
+                datasets["test"]["size"] >= datasets["test"]["max_size"]
+                and datasets["val"]["size"] >= datasets["val"]["max_size"]
+                and datasets["train"]["size"] >= datasets["train"]["max_size"]
+            ):
+                stop = True
 
             # Free file-specific data and trigger garbage collection
             del labels, images, mask, indices_to_remove
             gc.collect()
 
+            if stop:
+                break
+
         # Save any remaining samples and clean up
         for key, data in datasets.items():
-            if data["labels"] is not None and len(data["labels"]) > 0:
+            if not stop and data["labels"] is not None and len(data["labels"]) > 0:
                 save_batch(data["counter"], data["images"], data["labels"], key)
             del data["images"], data["labels"], data["counter"]
             gc.collect()

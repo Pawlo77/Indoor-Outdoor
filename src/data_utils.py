@@ -22,7 +22,7 @@ URL_TEMPLATE: str = (
     "/main/data/train-{id}-of-00330.parquet?download=true"
 )
 
-DATA_DIR: str = os.path.join(os.path.dirname(__file__), "..", "data")
+DATA_DIR: str = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
 
 
 # pylint: disable=magic-value-comparison
