@@ -140,7 +140,7 @@ def process_and_save_batches(
     test_indices_to_remove_per_file: Dict[str, np.ndarray],
     labels_files: List[str],
     images_files: List[str],
-    target_file_size: int = 10000,
+    target_file_size: int = 1000,
 ) -> None:
     """
     Process and save batches of images and labels in a memory efficient way.
@@ -210,7 +210,7 @@ def process_and_save_batches(
                     )
 
                 # Save batch if current data exceeds target_file_size
-                if len(data["labels"]) > target_file_size:
+                while len(data["labels"]) > target_file_size:
                     save_batch(
                         data["counter"],
                         data["images"][:target_file_size],

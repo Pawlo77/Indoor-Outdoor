@@ -1,5 +1,5 @@
 default_language_version:
-  python: python3.12.9
+  python: "python3"
 
 repos:
   # check yaml configs
@@ -72,9 +72,14 @@ repos:
           - scikit_learn
           - torch
           - tqdm
-          - transformers
+          - transformers[torch]
           - humanize
           - matplotlib
+          - torchvision
+          - timm
+          - torchinfo
+          - accelerate
+          - evaluate
 
   # python code security checks
   - repo: https://github.com/PyCQA/bandit
@@ -122,9 +127,14 @@ repos:
   #         - scikit_learn
   #         - torch
   #         - tqdm
-  #         - transformers
+  #         - transformers[torch]
   #         - humanize
   #         - matplotlib
+  #         - torchvision
+  #         - timm
+  #         - torchinfo
+  #         - accelerate
+  #         - evaluate
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

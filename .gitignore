@@ -4,6 +4,10 @@ data/
 experiments/
 datasets/
 
+# Logs
+*logs*
+*checkpoint-*
+
 # Tests
 test.ipynb
 

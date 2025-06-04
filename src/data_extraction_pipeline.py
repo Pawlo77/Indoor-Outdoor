@@ -14,6 +14,7 @@ from PIL.ImageFile import ImageFile
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
 from tqdm import tqdm
+
 from transformers import AutoImageProcessor, SiglipForImageClassification, pipeline
 
 from .data_utils import (
@@ -29,7 +30,13 @@ logger = get_logger(__name__)
 RESULTS_DIR: str = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "data_prepared")
 )
-DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
+if torch.cuda.is_available():
+    DEVICE = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    DEVICE = torch.device("mps")
+else:
+    DEVICE = torch.device("cpu")
 
 LABEL_TO_REMOVE: str = "animated chart or infographic"
 NOISE_CANDIDATE_LABELS: List[str] = [
@@ -311,7 +318,7 @@ def prepare_initial_set(
                     target=data_dir,
                     image_shape=image_shape,
                     executor=executor,
-                )[:100]
+                )
                 initial_rows = len(df)
 
             # Process the current dataset part.
