@@ -1,0 +1,16 @@
+\babel@toc {english}{}\relax
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
+\contentsline {section}{\numberline {2}Datasets}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Online datasets}{3}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}WIT Images Dataset}{5}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Automatic classification of images into indoor and outdoor categories using MLLMs}{6}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Automatic classification of images into indoor and outdoor categories using another architecture fine-tuned for this task}{7}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Further processing}{9}{subsubsection.2.2.3}%
+\contentsline {section}{\numberline {3}Models}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}\href {https://huggingface.co/blog/rwightman/mobilenetv4}{mobile net v4}}{10}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Other datasets}{10}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Our (wit) dataset}{11}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}\href {https://huggingface.co/blog/siglip2}{siglip 2}}{11}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Other datasets}{12}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Our (wit) dataset}{12}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Conclusion}{13}{subsection.3.3}%
